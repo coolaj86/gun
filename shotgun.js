@@ -123,7 +123,7 @@ _p.loadHelper = function (data, loaded) {
     }));
   });
 
-  return Promise.all(ps).then(function () {
+  return PromiseA.all(ps).then(function () {
     return data;
   });
 };
