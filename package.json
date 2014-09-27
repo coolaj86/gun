@@ -1,6 +1,6 @@
 {
   "name": "gunshot",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "AJ ONeal",
   "description": "Sane API atop Mark Nadal's Gun Graph engine.",
   "main": "shotgun.js",
