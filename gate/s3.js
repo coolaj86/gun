@@ -1,9 +1,12 @@
 ;module.exports = (function(a, own){
 
+  var _p
+
 	function s3(opt){
-		if(!(a.fns.is(this) || this instanceof s3)){
+		if(!(this instanceof s3)){
 			return new s3(opt);
 		}
+
 		var s = this;
 		s.own = a.on.split();
 		s.mime = require('mime');
@@ -14,26 +17,29 @@
 		s.AWS.config.region = s.config.region = opt.region || s.config.region || process.env.AWS_REGION || "us-east-1";
 		s.AWS.config.accessKeyId = s.config.accessKeyId = opt.key || opt.accessKeyId || s.config.accessKeyId || process.env.AWS_ACCESS_KEY_ID;
 		s.AWS.config.secretAccessKey = s.config.secretAccessKey = opt.secret || opt.secretAccessKey || s.config.secretAccessKey || process.env.AWS_SECRET_ACCESS_KEY;
-		if(s.config.fakes3 = s.config.fakes3 || opt.fakes3 || process.env.fakes3){
+		if (s.config.fakes3 = s.config.fakes3 || opt.fakes3 || process.env.fakes3) {
 			s.AWS.config.endpoint = s.config.endpoint = opt.fakes3 || s.config.fakes3 || process.env.fakes3;
 			s.AWS.config.sslEnabled = s.config.sslEnabled = false;
 			s.AWS.config.bucket = s.config.bucket = s.config.bucket.replace('.','p');
 		}
 		s.AWS.config.update(s.config);
 		s.S3 = function(){
-			var s = new this.AWS.S3();
+			var aws3 = new this.AWS.S3();
 			if(this.config.fakes3){
-				s.endpoint = config.endpoint;
+				aws3s.endpoint = config.endpoint;
 			}
-			return s;
+      return aws3;
 		}
-		return s;
-	};
+	}
+  s3.create = s3;
+
+	_p = s3.prototype;
+
 	s3.id = function(m){ return m.Bucket +'/'+ m.Key }
-	s3.chain = s3.prototype;
-	s3.chain.put = function(key, o, cb, m){
+	_p.put = function(key, o, cb, m){
+		m = m || {};
 		if(!key){ return }
-		var m = m || {}
+
 		m.Bucket = m.Bucket || this.config.bucket;
 		m.Key = m.Key || key;
 		if(a.obj.is(o) || a.list.is(o)){
@@ -49,8 +55,8 @@
 		});
 		return this;
 	}
-	s3.chain.get = function(key, cb, o){
-		if(!key){ return }
+	_p.get = function(key, cb, o){
+		if (!key) { return }
 		var s = this
 		, m = {
 			Bucket: s.config.bucket
@@ -61,15 +67,16 @@
 			if(!a.fns.is(cb)){ return }
 			try{ cb(e,d,t,m,r);
 			}catch(e){
-				console.log(e);
+				console.error(e);
 			}
 		});
 		s.batch = s.batch || {};
 		if(s.batch[id]){ return s }
 		s.batch[id] = (s.batch[id] || 0) + 1;
-		console.log("no batch!");
+		//console.log("no batch!");
 		s.S3().getObject(m, function(e,r){
-			var d, t, m, r = r || (this && this.httpResponse);
+			var d, t, m;
+      r = r || (this && this.httpResponse);
 			if(e || !r){ return s.own.on(id).emit(e) }
 			r.Text = r.text = t = (r.Body||r.body||'').toString('utf8');
 			r.Type = r.type = r.ContentType || (r.headers||{})['content-type'];
@@ -81,7 +88,7 @@
 		});
 		return s;
 	}
-	s3.chain.del = function(key, cb){
+	_p.del = function(key, cb){
 		if(!key){ return }
 		var m = {
 			Bucket: this.config.bucket
@@ -93,7 +100,7 @@
 		});
 		return this;
 	}
-	s3.chain.dbs = function(o, cb){
+	_p.dbs = function(o, cb){
 		cb = cb || o;
 		var m = {}
 		this.S3().listBuckets(m, function(e,r){
@@ -105,7 +112,7 @@
 		});
 		return this;
 	}
-	s3.chain.keys = function(from, upto, cb){
+	_p.keys = function(from, upto, cb){
 		cb = cb || upto || from;
 		var m = {
 			Bucket: this.config.bucket
@@ -118,7 +125,7 @@
 		}
 		this.S3().listObjects(m, function(e,r){
 			//console.log('list',e);
-			a.list.each((r||{}).Contents, function(v){console.log(v)});
+			a.list.each((r||{}).Contents, function(v){ /*console.log(v)*/ });
 			//console.log('---end list---');
 			if(!a.fns.is(cb)) return;
 			cb(e,r);
